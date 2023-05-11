@@ -9,7 +9,6 @@ import com.example.chain_finder.repository.ShopInfoDao;
 import com.example.chain_finder.repository.TypeAndStoreNameDao;
 import com.example.chain_finder.service.ifs.ChainFinderService;
 import com.example.chain_finder.vo.ChainFinderResponse;
-import jakarta.persistence.Column;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -29,9 +28,9 @@ public class ChainFinderImpl implements ChainFinderService {
   ShopInfoDao shopInfoDao;
 
   @Override
-  // 新增shop_info表格店家
+  // 新增表格shop_info店家
   // 可多筆新增，錯物的資訊不儲存，僅儲存正確的資訊
-  // type_and_store_name表格無該店家，需要連帶新增
+  // 表格type_and_store_name無該店家，需要連帶新增
   public ChainFinderResponse addShop(List<AddShopRequest> addShopRequests) {
 
     // 用於紀錄目前是第幾筆資料
@@ -53,14 +52,14 @@ public class ChainFinderImpl implements ChainFinderService {
         continue;
       }
 
-      // 判斷ShopInfo表格的「店名與分店名」是否有重複
+      // 判斷表格ShopInfo的「店名與分店名」是否有重複
       if (shopInfoDao.existsByStoreNameAndBranchName(shopInfo.getStoreName(), shopInfo.getBranchName())) {
         index++;
-        rtnMessages.add("第" + index + "筆資料：" + RtnCode.DUPLICATE_STORE_ID_OR_BRANCH_NAME_ERROR.getMessage());
+        rtnMessages.add("第" + index + "筆資料：" + RtnCode.DUPLICATE_STORE_NAME_OR_BRANCH_NAME_ERROR.getMessage());
         continue;
       }
 
-      // 判斷TypeAndStoreName表格的「店名」是否有該店名
+      // 判斷表格TypeAndStoreName的「店名」是否有該店名
       // 沒有則需要先新增才允許新增判斷ShopInfo的資料
       // 因需要決定「店家類型」，所以無法該方法新增TypeAndStoreName的資料
       if (!typeAndStoreNameDao.existsByStoreName(shopInfo.getStoreName())) {
@@ -82,16 +81,16 @@ public class ChainFinderImpl implements ChainFinderService {
   }
 
   @Override
-  // 新增type_and_store_name表格店家
+  // 新增表格type_and_store_name店家
   // 可多筆新增，錯物的資訊不儲存，僅儲存正確的資訊
-  public ChainFinderResponse addTypeAndStoreNameRequest(List<AddTypeAndStoreNameRequest> addTypeAndStoreNameRequests){
+  public ChainFinderResponse addTypeAndStoreNameRequest(List<AddTypeAndStoreNameRequest> addTypeAndStoreNameRequests) {
 
     // 用於紀錄目前是第幾筆資料
     int index = 0;
     // 用於儲存錯誤資訊
     List<String> rtnMessages = new ArrayList<>();
-    // 用於儲存欲刪除且資訊正確店家
-    List<Integer> shopIds = new ArrayList<>();
+    // 用於儲存欲新增且資訊正確店家
+    List<TypeAndStoreName> shopInfos = new ArrayList<>();
 
     // 判斷集合是否為空
     if (CollectionUtils.isEmpty(addTypeAndStoreNameRequests)) {
@@ -106,22 +105,32 @@ public class ChainFinderImpl implements ChainFinderService {
 
       // 判斷值是否為空
       if (type > 3
-              || type <1
-              || !StringUtils.hasText(storeName)){
+              || type < 1
+              || !StringUtils.hasText(storeName)) {
         index++;
         rtnMessages.add("第" + index + "筆資料：" + RtnCode.SHOP_INFO_ERROR.getMessage());
         continue;
       }
 
-      // 判斷TypeAndStoreName表格的「店名與分店名」是否有重複
+      // 判斷表格TypeAndStoreName的「店家類型與店名」是否有重複
+      if (typeAndStoreNameDao.existsByStoreName(storeName)) {
+        index++;
+        rtnMessages.add("第" + index + "筆資料：" + RtnCode.DUPLICATE_STORE_NAME_ERROR.getMessage());
+        continue;
+      }
 
-
+      //儲存至ShopInfo集合，下面批次儲存至資料庫
+      index++;
+      shopInfos.add(new TypeAndStoreName(type, storeName));
+      rtnMessages.add("第" + index + "筆資料：" + RtnCode.ADD_SHOP_SUCCESS.getMessage());
     }
+    typeAndStoreNameDao.saveAll(shopInfos);
+    return new ChainFinderResponse(rtnMessages);
   }
 
 
   @Override
-  // 刪除shop_info表格店家，依店名+分店名刪除
+  // 刪除表格shop_info店家，依店名+分店名刪除
   // 可多筆刪除，錯物資訊的店家不刪除，僅刪除正確資訊的店鋪編號
   public ChainFinderResponse deleteShop(List<DeleteShopRequest> deleteShopRequests) {
 
@@ -171,9 +180,9 @@ public class ChainFinderImpl implements ChainFinderService {
   }
 
   @Override
-  // 刪除type_and_store_name表格店家，依店家類型+店名刪除
+  // 刪除表格type_and_store_name店家，依店家類型+店名刪除
   // 可刪除多筆，錯物資訊的店家不刪除，僅刪除正確資訊的店鋪編號
-  // 刪除成功，連帶shop_info表格店家也會被刪除
+  // 刪除成功，連帶表格shop_info店家也會被刪除
   public ChainFinderResponse deleteTypeAndStoreName(List<DeleteTypeAndStoreNameRequest> deleteTypeAndStoreNameRequests) {
 
     // 用於紀錄目前是第幾筆資料
@@ -234,8 +243,13 @@ public class ChainFinderImpl implements ChainFinderService {
   }
 
   @Override
-  // 更新shop_info表格店家
+  // 更新表格shop_info店家
   public ChainFinderResponse updateShop(UpdateShopRequest updateShopRequest) {
+
+    // 判斷是否為空
+    if (updateShopRequest == null) {
+      return new ChainFinderResponse(RtnCode.SHOP_INFO_ERROR.getMessage());
+    }
 
     // 取出ShopInfo
     ShopInfo newShop = updateShopRequest.getShopInfo();
@@ -248,7 +262,52 @@ public class ChainFinderImpl implements ChainFinderService {
       return new ChainFinderResponse(RtnCode.SHOP_INFO_ERROR.getMessage());
     }
 
-    // 取得表格shop_info內該店家的資訊
+    // 取得表格type_and_store_name內該店家的資訊
+    // 判斷店家是否存在
+    Optional<TypeAndStoreName> opShop = typeAndStoreNameDao.findById(newShop.getId());
+    if (!opShop.isPresent()) {
+      return new ChainFinderResponse(RtnCode.SHOP_NOT_FOUND_ERROR.getMessage());
+    }
+    TypeAndStoreName oldShop = opShop.get();
+
+    // 判斷店名是否更新
+    // 如要更新，則再判斷表格shop_info內有沒有同名店家
+    // 有同名店家則連帶更新
+    if(shopInfoDao.existsByStoreName(storeName)) {
+
+      }
+
+
+    // 使用Copy Constructor
+    ShopInfo copyShop = new ShopInfo(newShop);
+    shopInfoDao.save(copyShop);
+    return new ChainFinderResponse(copyShop, RtnCode.UPDATE_SHOP_SUCCESS.getMessage());
+  }
+
+  @Override
+  // 更新表格type_and_store_name店家
+  // 更新成功，連帶表格shop_info店家也會被更新
+  public ChainFinderResponse UpdateTypeAndStoreName(UpdateTypeAndStoreNameRequest updateTypeAndStoreNameRequest) {
+
+    // 判斷是否為空
+    if (updateTypeAndStoreNameRequest == null) {
+      return new ChainFinderResponse(RtnCode.SHOP_INFO_ERROR.getMessage());
+    }
+
+    // 取出ShopInfo
+    TypeAndStoreName newShop = updateTypeAndStoreNameRequest.getTypeAndStoreName();
+    // 宣告常用變數
+    int type = newShop.getType();
+    String storeName = newShop.getStoreName();
+
+    // 判斷是否為空
+    if (type < 1
+            || type > 3
+            || !StringUtils.hasText(storeName)) {
+      return new ChainFinderResponse(RtnCode.SHOP_INFO_ERROR.getMessage());
+    }
+
+    // 取得表格type_and_store_name內該店家的資訊
     // 判斷店家是否存在
     Optional<ShopInfo> opShop = shopInfoDao.findById(newShop.getId());
     if (!opShop.isPresent()) {
@@ -256,21 +315,7 @@ public class ChainFinderImpl implements ChainFinderService {
     }
     ShopInfo oldShop = opShop.get();
 
-    // 判斷店名是否更新
-    // 如要更新，則再判斷表格type_and_store_name內有沒有對應店家
-    // 無對應店家則要求先新增表格type_and_store_name的店家資訊
-    if (!oldShop.getStoreName().equals(newShop.getStoreName())) {
-      if (!typeAndStoreNameDao.existsByStoreName(newShop.getStoreName())) {
-        return new ChainFinderResponse(RtnCode.SHOP_NOT_FOUND_ERROR.getMessage());
-      }
-    }
-
-    // 使用Copy Constructor
-    ShopInfo copyShop = new ShopInfo(newShop);
-    shopInfoDao.save(copyShop);
-    return new ChainFinderResponse(copyShop,RtnCode.UPDATE_SHOP_SUCCESS.getMessage());
   }
-
 
 
   // 值為空反回true

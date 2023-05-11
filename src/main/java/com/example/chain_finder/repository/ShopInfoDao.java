@@ -23,4 +23,5 @@ public interface ShopInfoDao extends JpaRepository<ShopInfo, Integer> {
 
   public ShopInfo findByStoreNameAndBranchName(String storeName,String branchName);
 
+  public boolean existsByStoreName(String storeName);
 }
