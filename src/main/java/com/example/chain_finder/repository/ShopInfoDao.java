@@ -11,12 +11,16 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Repository
-public interface ShopInfoDao extends JpaRepository<ShopInfo, ShopInfo.ShopInfoKey> {
+public interface ShopInfoDao extends JpaRepository<ShopInfo, Integer> {
 
   // 批量刪除並返回刪除筆數
   @Transactional
   @Modifying
-  @Query(value = "delete from shop_info s where s.store_name in :storeName", nativeQuery = true)
-  int deleteAllByIds(@Param("storeName") List<String> storeName);
+  @Query(value = "delete from shop_info s where s.store_name in :storeNames", nativeQuery = true)
+  int deleteAllByStoreNames(@Param("storeNames") List<String> storeNames);
+
+  public boolean existsByStoreNameAndBranchName(String storeName,String branchName);
+
+  public ShopInfo findByStoreNameAndBranchName(String storeName,String branchName);
 
 }

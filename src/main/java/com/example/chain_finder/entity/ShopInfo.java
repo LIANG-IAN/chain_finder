@@ -2,15 +2,15 @@ package com.example.chain_finder.entity;
 
 import jakarta.persistence.*;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "shop_info")
 public class ShopInfo {
 
-  @EmbeddedId
-  private ShopInfoKey id;
+  @Id
+  @Column(name = "id")
+  private int id;
 
   @Column(name = "store_name") // 店名
   private String storeName;
@@ -47,11 +47,11 @@ public class ShopInfo {
     this.branchName = branchName;
   }
 
-  public ShopInfoKey getId() {
+  public int getId() {
     return id;
   }
 
-  public void setId(ShopInfoKey id) {
+  public void setId(int id) {
     this.id = id;
   }
 
@@ -127,37 +127,17 @@ public class ShopInfo {
     this.url = url;
   }
 
-  @Embeddable
-  public static class ShopInfoKey implements Serializable{
-
-  @Column(name = "store_name") // 店名
-  private String storeName;
-
-  @Column(name = "branch_name") // 分店名 不可重複
-  private String branchName;
-
-  public ShopInfoKey() {
+  // Copy Constructor
+  public ShopInfo(ShopInfo other) {
+    this.id = other.id;
+    this.storeName = other.storeName;
+    this.branchName = other.branchName;
+    this.latitude = other.latitude;
+    this.longitude = other.longitude;
+    this.address = other.address;
+    this.businessHours = other.businessHours;
+    this.dayOff = other.dayOff;
+    this.tel = other.tel;
+    this.url = other.url;
   }
-
-    public ShopInfoKey(String storeName, String branchName) {
-      this.storeName = storeName;
-      this.branchName = branchName;
-    }
-
-    public String getStoreName() {
-    return storeName;
-  }
-
-  public void setStoreName(String storeName) {
-    this.storeName = storeName;
-  }
-
-  public String getBranchName() {
-    return branchName;
-  }
-
-  public void setBranchName(String branchName) {
-    this.branchName = branchName;
-  }
-}
 }

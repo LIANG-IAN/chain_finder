@@ -1,20 +1,20 @@
 package com.example.chain_finder.controller;
 
-import com.example.chain_finder.entity.TypeAndStoreName;
 
 public class DeleteTypeAndStoreNameRequest {
 
-  private TypeAndStoreName.TypeAndStoreNameKey id;
+  private int type;
 
-  public DeleteTypeAndStoreNameRequest(TypeAndStoreName.TypeAndStoreNameKey id) {
-    this.id = id;
+  private String storeName;
+
+  public DeleteTypeAndStoreNameRequest() {
   }
 
-  public TypeAndStoreName.TypeAndStoreNameKey getId() {
-    return id;
+  public int getType() {
+    return type;
   }
 
-  public void setId(TypeAndStoreName.TypeAndStoreNameKey id) {
-    this.id = id;
+  public String getStoreName() {
+    return storeName;
   }
 }

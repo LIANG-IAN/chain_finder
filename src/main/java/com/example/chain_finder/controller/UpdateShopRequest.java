@@ -4,16 +4,12 @@ import com.example.chain_finder.entity.ShopInfo;
 
 public class UpdateShopRequest {
 
-  private ShopInfo.ShopInfoKey id;
+  private ShopInfo shopInfo;
 
   public UpdateShopRequest() {
   }
 
-  public UpdateShopRequest(ShopInfo.ShopInfoKey id) {
-    this.id = id;
-  }
-
-  public ShopInfo.ShopInfoKey getId() {
-    return id;
+  public ShopInfo getShopInfo() {
+    return shopInfo;
   }
 }

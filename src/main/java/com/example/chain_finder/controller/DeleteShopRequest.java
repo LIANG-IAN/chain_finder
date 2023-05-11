@@ -4,16 +4,18 @@ import com.example.chain_finder.entity.ShopInfo;
 
 public class DeleteShopRequest {
 
-  private ShopInfo.ShopInfoKey id;
+  private String storeName;
+
+  private String branchName;
 
   public DeleteShopRequest() {
   }
 
-  public DeleteShopRequest(ShopInfo.ShopInfoKey id) {
-    this.id = id;
+  public String getStoreName() {
+    return storeName;
   }
 
-  public ShopInfo.ShopInfoKey getId() {
-    return id;
+  public String getBranchName() {
+    return branchName;
   }
 }

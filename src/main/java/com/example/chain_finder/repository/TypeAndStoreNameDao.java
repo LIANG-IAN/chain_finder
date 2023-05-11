@@ -5,7 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface TypeAndStoreNameDao extends JpaRepository<TypeAndStoreName, TypeAndStoreName.TypeAndStoreNameKey> {
+public interface TypeAndStoreNameDao extends JpaRepository<TypeAndStoreName, Integer> {
 
   public boolean existsByStoreName(String storeName);
+
+  public TypeAndStoreName findByTypeAndStoreName(int type,String storeName);
 }
