@@ -9,6 +9,7 @@ public class ChainFinderResponse {
 
   private List<TypeAndStoreName> id1List;
 
+  private TypeAndStoreName typeAndStoreName;
 
   private List<ShopInfo> id2List;
 
@@ -19,6 +20,11 @@ public class ChainFinderResponse {
   private List<String> messageList;
 
   public ChainFinderResponse() {
+  }
+
+  public ChainFinderResponse(TypeAndStoreName typeAndStoreName, String message) {
+    this.typeAndStoreName = typeAndStoreName;
+    this.message = message;
   }
 
   public ChainFinderResponse(ShopInfo shopInfo, String message) {
@@ -44,11 +50,17 @@ public class ChainFinderResponse {
     return id1List;
   }
 
+  public TypeAndStoreName getTypeAndStoreName() {
+    return typeAndStoreName;
+  }
 
   public List<ShopInfo> getId2List() {
     return id2List;
   }
 
+  public ShopInfo getShopInfo() {
+    return shopInfo;
+  }
 
   public String getMessage() {
     return message;

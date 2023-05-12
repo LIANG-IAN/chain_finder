@@ -24,4 +24,12 @@ public interface ShopInfoDao extends JpaRepository<ShopInfo, Integer> {
   public ShopInfo findByStoreNameAndBranchName(String storeName,String branchName);
 
   public boolean existsByStoreName(String storeName);
+
+  // 更新店名
+  @Transactional
+  @Modifying
+  @Query(value = "update shop_info p set p.store_name = :newStoreName where p.store_name = :oldStoreName",nativeQuery = true)
+  public int updateByStoreName(
+          @Param("newStoreName")String newStoreName,
+          @Param("oldStoreName")String oldStoreName);
 }

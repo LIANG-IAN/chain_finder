@@ -1,6 +1,5 @@
 package com.example.chain_finder;
 
-import com.example.chain_finder.repository.ChainFinderDao;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

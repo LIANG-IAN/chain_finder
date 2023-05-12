@@ -2,7 +2,6 @@ package com.example.chain_finder.entity;
 
 import jakarta.persistence.*;
 
-import java.io.Serializable;
 
 @Entity
 @Table(name = "type_and_store_name")
@@ -50,4 +49,10 @@ public class TypeAndStoreName {
     this.storeName = store_name;
   }
 
+  // Copy Constructor
+  public TypeAndStoreName(TypeAndStoreName other) {
+    this.id = other.id;
+    this.type = other.id;
+    this.storeName = other.storeName;
+  }
 }

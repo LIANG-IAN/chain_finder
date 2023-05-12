@@ -253,9 +253,6 @@ public class ChainFinderImpl implements ChainFinderService {
 
     // 取出ShopInfo
     ShopInfo newShop = updateShopRequest.getShopInfo();
-    // 宣告常用變數
-    String storeName = newShop.getStoreName();
-    String branchName = newShop.getBranchName();
 
     // 判斷值是否為空
     if (shopInfoCheck(newShop)) {
@@ -263,20 +260,10 @@ public class ChainFinderImpl implements ChainFinderService {
     }
 
     // 取得表格type_and_store_name內該店家的資訊
-    // 判斷店家是否存在
-    Optional<TypeAndStoreName> opShop = typeAndStoreNameDao.findById(newShop.getId());
-    if (!opShop.isPresent()) {
+    // 判斷店家是否存在，應該要存在否則更新失敗
+    if (typeAndStoreNameDao.existsByStoreName(newShop.getStoreName())) {
       return new ChainFinderResponse(RtnCode.SHOP_NOT_FOUND_ERROR.getMessage());
     }
-    TypeAndStoreName oldShop = opShop.get();
-
-    // 判斷店名是否更新
-    // 如要更新，則再判斷表格shop_info內有沒有同名店家
-    // 有同名店家則連帶更新
-    if(shopInfoDao.existsByStoreName(storeName)) {
-
-      }
-
 
     // 使用Copy Constructor
     ShopInfo copyShop = new ShopInfo(newShop);
@@ -287,7 +274,7 @@ public class ChainFinderImpl implements ChainFinderService {
   @Override
   // 更新表格type_and_store_name店家
   // 更新成功，連帶表格shop_info店家也會被更新
-  public ChainFinderResponse UpdateTypeAndStoreName(UpdateTypeAndStoreNameRequest updateTypeAndStoreNameRequest) {
+  public ChainFinderResponse updateTypeAndStoreName(UpdateTypeAndStoreNameRequest updateTypeAndStoreNameRequest) {
 
     // 判斷是否為空
     if (updateTypeAndStoreNameRequest == null) {
@@ -298,12 +285,12 @@ public class ChainFinderImpl implements ChainFinderService {
     TypeAndStoreName newShop = updateTypeAndStoreNameRequest.getTypeAndStoreName();
     // 宣告常用變數
     int type = newShop.getType();
-    String storeName = newShop.getStoreName();
+    String newStoreName = newShop.getStoreName();
 
     // 判斷是否為空
     if (type < 1
             || type > 3
-            || !StringUtils.hasText(storeName)) {
+            || !StringUtils.hasText(newStoreName)) {
       return new ChainFinderResponse(RtnCode.SHOP_INFO_ERROR.getMessage());
     }
 
@@ -315,6 +302,17 @@ public class ChainFinderImpl implements ChainFinderService {
     }
     ShopInfo oldShop = opShop.get();
 
+    // 更新表格shop_info內相同店名的店家
+    // 省略判斷店名是否存在表格shop_info
+    // 省略判斷是否更新表格type_and_store_name店名
+    // 因為不存在就不會執行更新
+    // 注意是用舊店名搜尋
+    shopInfoDao.updateByStoreName(newStoreName, oldShop.getStoreName());
+
+    // 使用Copy Constructor
+    TypeAndStoreName copyShop = new TypeAndStoreName(newShop);
+    typeAndStoreNameDao.save(copyShop);
+    return new ChainFinderResponse(copyShop, RtnCode.UPDATE_SHOP_SUCCESS.getMessage());
   }
 
 
