@@ -34,7 +34,7 @@ public class ChainFinderImpl implements ChainFinderService {
   public ChainFinderResponse addShop(List<AddShopRequest> addShopRequests) {
 
     // 用於紀錄目前是第幾筆資料
-    int index = 0;
+    int index = 1;
     // 用於儲存錯誤資訊
     List<String> rtnMessages = new ArrayList<>();
     // 用於儲存正確店家資訊
@@ -86,7 +86,7 @@ public class ChainFinderImpl implements ChainFinderService {
   public ChainFinderResponse addTypeAndStoreNameRequest(List<AddTypeAndStoreNameRequest> addTypeAndStoreNameRequests) {
 
     // 用於紀錄目前是第幾筆資料
-    int index = 0;
+    int index = 1;
     // 用於儲存錯誤資訊
     List<String> rtnMessages = new ArrayList<>();
     // 用於儲存欲新增且資訊正確店家
@@ -135,7 +135,7 @@ public class ChainFinderImpl implements ChainFinderService {
   public ChainFinderResponse deleteShop(List<DeleteShopRequest> deleteShopRequests) {
 
     // 用於紀錄目前是第幾筆資料
-    int index = 0;
+    int index = 1;
     // 用於儲存錯誤資訊
     List<String> rtnMessages = new ArrayList<>();
     // 用於儲存欲刪除且資訊正確店家
@@ -186,7 +186,7 @@ public class ChainFinderImpl implements ChainFinderService {
   public ChainFinderResponse deleteTypeAndStoreName(List<DeleteTypeAndStoreNameRequest> deleteTypeAndStoreNameRequests) {
 
     // 用於紀錄目前是第幾筆資料
-    int index = 0;
+    int index = 1;
     // 用於儲存錯誤資訊
     List<String> rtnMessages = new ArrayList<>();
     // 用於儲存欲從表格type_and_store_name刪除且資訊正確店家
